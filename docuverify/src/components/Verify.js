@@ -30,8 +30,8 @@ function Verify() {
     };
 
     return (
-        <div className="container">
-            <Row className="justify-content-center align-items-center vh-100 pt-5">
+        <div className="container" style={{ marginTop: '4rem' }}>
+            <Row className="justify-content-center align-items-center pt-5">
                 <Col md={6}>
                     <h2 className="text-center mb-4">Verify Document</h2>
                     {error && <Alert variant="danger">{error}</Alert>}
