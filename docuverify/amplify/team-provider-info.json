@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-docuverify-dev-235327-authRole",
+      "UnauthRoleArn": "arn:aws:iam::206648566623:role/amplify-docuverify-dev-235327-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::206648566623:role/amplify-docuverify-dev-235327-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-docuverify-dev-235327-deployment",
+      "UnauthRoleName": "amplify-docuverify-dev-235327-unauthRole",
+      "StackName": "amplify-docuverify-dev-235327",
+      "StackId": "arn:aws:cloudformation:us-east-1:206648566623:stack/amplify-docuverify-dev-235327/b9f86eb0-760e-11ee-b7ea-0a4251c17519",
+      "AmplifyAppId": "d2n6q84xqekvsw"
+    },
+    "categories": {
+      "auth": {
+        "docuverifyf3e26b9f": {}
+      },
+      "storage": {
+        "docuVerify": {}
+      }
+    }
+  }
+}

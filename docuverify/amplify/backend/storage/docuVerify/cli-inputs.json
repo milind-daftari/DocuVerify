@@ -1,0 +1,13 @@
+{
+  "resourceName": "docuVerify",
+  "policyUUID": "9c962715",
+  "bucketName": "docuverify7e351a5df9ed4e7bbfc92395d6640533",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}
