@@ -34,8 +34,8 @@ function App() {
                 <NavbarComponent isConnected={isConnected} onConnect={handleConnect} onDisconnect={handleDisconnect} />
                 <Routes>
                     <Route path="/" element={<Home account={account} />} />
-                    <Route path="/upload" element={<Upload />} />
-                    <Route path="/verify" element={<Verify />} />
+                    <Route path="/upload" element={isConnected ? <Upload /> : <p>Please connect with your wallet.</p>} />
+                    <Route path="/verify" element={isConnected ? <Verify /> : <p>Please connect with your wallet.</p>} />
                 </Routes>
             </div>
         </Router>
