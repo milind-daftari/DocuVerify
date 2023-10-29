@@ -33,14 +33,16 @@ function NavbarComponent({ isConnected, onConnect, onDisconnect }) {
             <Container fluid className="d-flex justify-content-between align-items-center">
                 <div className="d-flex align-items-center">
                     <Navbar.Brand as={Link} to="/">DocuVerify</Navbar.Brand>
-                    <Nav className="mr-auto">
-                        <Nav.Item as="li">
-                            <NavLink to="/upload" className="nav-link">Upload</NavLink>
-                        </Nav.Item>
-                        <Nav.Item as="li">
-                            <NavLink to="/verify" className="nav-link">Verify</NavLink>
-                        </Nav.Item>
-                    </Nav>
+                    {isConnected && (
+                        <Nav className="mr-auto">
+                            <Nav.Item as="li">
+                                <NavLink to="/upload" className="nav-link">Upload</NavLink>
+                            </Nav.Item>
+                            <Nav.Item as="li">
+                                <NavLink to="/verify" className="nav-link">Verify</NavLink>
+                            </Nav.Item>
+                        </Nav>
+                    )}
                 </div>
                 <Nav>
                     {isConnected ? (
