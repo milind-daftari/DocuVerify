@@ -1,8 +1,25 @@
 import React, { useState } from 'react';
 import { Button, Form, Alert, OverlayTrigger, Tooltip, Row, Col } from 'react-bootstrap';
+import { Storage } from 'aws-amplify';
 
 function Upload() {
     const [error, setError] = useState('');
+    const [uploading, setUploading] = useState(false);
+
+    const handleFileUpload = async (file) => {
+        try {
+            setUploading(true);
+            await Storage.put(file.name, file, {
+                contentType: file.type
+            });
+            alert('File uploaded successfully');
+        } catch (err) {
+            console.error('Error uploading the file: ', err);
+            setError('Error uploading the file');
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -40,7 +57,12 @@ function Upload() {
             }
 
             setError('');
+            handleFileUpload(file);
         }
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault(); // prevent default form submission
     };
 
     return (
@@ -49,7 +71,7 @@ function Upload() {
                 <Col md={6}>
                     <h2 className="text-center mb-4">Upload Document</h2>
                     {error && <Alert variant="danger">{error}</Alert>}
-                    <Form>
+                    <Form onSubmit={handleSubmit}>
                         <Form.Group controlId="formFile" className="mb-3">
                             <Form.Label>Upload your document</Form.Label>
                             <OverlayTrigger
@@ -59,7 +81,7 @@ function Upload() {
                                         File size limit is 5MB. No special characters are allowed in the file name. Only PDF files are allowed.
                                     </Tooltip>
                                 }>
-                                <Form.Control type="file" onChange={handleFileChange} />
+                                <Form.Control type="file" onChange={handleFileChange} disabled={uploading} />
                             </OverlayTrigger>
                         </Form.Group>
                         <Form.Group className="mb-3">
@@ -67,8 +89,8 @@ function Upload() {
                             <Form.Control type="text" placeholder="Enter a brief description of the document" />
                         </Form.Group>
                         <div className="d-flex justify-content-center">
-                            <Button variant="primary" type="submit">
-                                Upload
+                            <Button variant="primary" type="submit" disabled={uploading}>
+                                {uploading ? 'Uploading...' : 'Upload'}
                             </Button>
                         </div>
                     </Form>
