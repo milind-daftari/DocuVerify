@@ -1,6 +1,6 @@
 {
   "auth": {
-    "docuverifyf3e26b9f": {
+    "docuverify4213fd4f": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -25,8 +25,15 @@
       "service": "Cognito"
     }
   },
+  "hosting": {
+    "amplifyhosting": {
+      "providerPlugin": "awscloudformation",
+      "service": "amplifyhosting",
+      "type": "manual"
+    }
+  },
   "storage": {
-    "docuVerify": {
+    "docuverifyUploads": {
       "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "S3"

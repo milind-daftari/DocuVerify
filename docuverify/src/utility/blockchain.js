@@ -1,5 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { formatEther, parseEther } from 'ethers';
+import { BigNumber} from "@ethersproject/bignumber";
+import { formatEther} from "@ethersproject/units";
 
 export const getBalance = async (address) => {
     const provider = new Web3Provider(window.ethereum);
@@ -8,7 +9,7 @@ export const getBalance = async (address) => {
         console.log("Fetched raw balance:", balance);
         
         // Check if the balance is a valid BigNumber before formatting
-        if (ethers.BigNumber.isBigNumber(balance)) {
+        if (BigNumber.isBigNumber(balance)) {
             return formatEther(balance);
         } else {
             console.error("Balance is not a valid BigNumber:", balance);
@@ -29,17 +30,3 @@ export const getNetworkName = async () => {
         console.error("Error getting network:", error);
     }
 }
-
-export const sendTransaction = async (to, value) => {
-    const signer = (new Web3Provider(window.ethereum)).getSigner();
-    try {
-        const txResponse = await signer.sendTransaction({
-            to: to,
-            value: parseEther(value)
-        });
-        return txResponse;
-    } catch (error) {
-        console.error("Error sending transaction:", error);
-    }
-}
-

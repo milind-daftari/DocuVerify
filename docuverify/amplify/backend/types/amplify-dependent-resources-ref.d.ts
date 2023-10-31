@@ -1,6 +1,6 @@
 export type AmplifyDependentResourcesAttributes = {
   "auth": {
-    "docuverifyf3e26b9f": {
+    "docuverify4213fd4f": {
       "AppClientID": "string",
       "AppClientIDWeb": "string",
       "IdentityPoolId": "string",
@@ -11,7 +11,7 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "storage": {
-    "docuVerify": {
+    "docuverifyUploads": {
       "BucketName": "string",
       "Region": "string"
     }
