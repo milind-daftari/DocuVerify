@@ -5,8 +5,15 @@ export const getBalance = async (address) => {
     const provider = new Web3Provider(window.ethereum);
     try {
         const balance = await provider.getBalance(address);
-        console.log("Fetched balance:", balance);
-        return formatEther(balance);
+        console.log("Fetched raw balance:", balance);
+        
+        // Check if the balance is a valid BigNumber before formatting
+        if (ethers.BigNumber.isBigNumber(balance)) {
+            return formatEther(balance);
+        } else {
+            console.error("Balance is not a valid BigNumber:", balance);
+            return "0.0";  // Default to zero if the balance isn't valid
+        }
     } catch (error) {
         console.error("Error getting balance:", error);
     }
@@ -25,9 +32,14 @@ export const getNetworkName = async () => {
 
 export const sendTransaction = async (to, value) => {
     const signer = (new Web3Provider(window.ethereum)).getSigner();
-    const txResponse = await signer.sendTransaction({
-        to: to,
-        value: parseEther(value)
-    });
-    return txResponse;
+    try {
+        const txResponse = await signer.sendTransaction({
+            to: to,
+            value: parseEther(value)
+        });
+        return txResponse;
+    } catch (error) {
+        console.error("Error sending transaction:", error);
+    }
 }
+

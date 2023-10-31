@@ -5,12 +5,20 @@ import { Storage } from 'aws-amplify';
 function Upload() {
     const [error, setError] = useState('');
     const [uploading, setUploading] = useState(false);
+    const [documentDescription, setDocumentDescription] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
 
-    const handleFileUpload = async (file) => {
+    const handleFileUpload = async () => {
+        if (!selectedFile) {
+            setError('Please select a valid file.');
+            return;
+        }
+
         try {
             setUploading(true);
-            await Storage.put(file.name, file, {
-                contentType: file.type
+            await Storage.put(selectedFile.name, selectedFile, {
+                contentType: selectedFile.type,
+                metadata: { description: documentDescription }  // Add the description as metadata
             });
             alert('File uploaded successfully');
         } catch (err) {
@@ -21,48 +29,37 @@ function Upload() {
         }
     };
 
+    const handleDescriptionChange = (e) => {
+        setDocumentDescription(e.target.value);
+    };
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             const fileName = file.name;
 
-            // Check for special characters and multiple dots in the filename first
-            if (/[^a-zA-Z0-9.-]/.test(fileName.split('.').shift()) || (fileName.match(/\./g) || []).length > 1) {
-                setError('File name should not have special characters.');
+            // Allow alphanumeric characters along with -, _, and dots in the filename
+            if (!/^[a-zA-Z0-9.-_]+$/.test(fileName)) {
+                setError('File name should only have alphanumeric characters, hyphens, underscores, and dots.');
                 e.target.value = '';
                 return;
             }
 
             const fileExtension = fileName.split('.').pop().toLowerCase();
-            const validExtensions = ['pdf'];
-
-            if (!validExtensions.includes(fileExtension)) {
-                setError('Invalid file type. Please upload a valid document format [pdf].');
-                e.target.value = '';
-                return;
-            }
-
-            // MIME Type Check (client-side, this can be spoofed)
-            const validMimeTypes = ['application/pdf'];
-            if (!validMimeTypes.includes(file.type)) {
-                setError('Invalid MIME type. Please upload a valid PDF document.');
-                e.target.value = '';
-                return;
-            }
-
-            if (file.size > 5 * 1024 * 1024) { // 5 MB in bytes
-                setError('File size exceeds the limit of 5 MB.');
+            if (fileExtension !== 'pdf') {
+                setError('Invalid file type. Please upload a PDF.');
                 e.target.value = '';
                 return;
             }
 
             setError('');
-            handleFileUpload(file);
+            setSelectedFile(file);  // Set the file for later upload
         }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault(); // prevent default form submission
+        handleFileUpload();  // Upload the file upon submit
     };
 
     return (
@@ -78,15 +75,21 @@ function Upload() {
                                 placement="right"
                                 overlay={
                                     <Tooltip>
-                                        File size limit is 5MB. No special characters are allowed in the file name. Only PDF files are allowed.
+                                        File size limit is 5MB. File name should contain alphanumeric characters, hyphens, and underscores only. Only PDF files are allowed.
                                     </Tooltip>
                                 }>
                                 <Form.Control type="file" onChange={handleFileChange} disabled={uploading} />
                             </OverlayTrigger>
                         </Form.Group>
                         <Form.Group className="mb-3">
-                            <Form.Label>Document Description</Form.Label>
-                            <Form.Control type="text" placeholder="Enter a brief description of the document" />
+                            <Form.Label>Document Description (max 128 characters)</Form.Label>
+                            <Form.Control 
+                                type="text" 
+                                placeholder="Enter a brief description of the document" 
+                                value={documentDescription}
+                                onChange={handleDescriptionChange}
+                                maxLength={128}
+                            />
                         </Form.Group>
                         <div className="d-flex justify-content-center">
                             <Button variant="primary" type="submit" disabled={uploading}>

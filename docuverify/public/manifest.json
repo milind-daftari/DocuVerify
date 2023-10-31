@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "DocuVerify",
+  "name": "Verify Authenticity of your Documents",
   "icons": [
     {
       "src": "favicon.ico",
