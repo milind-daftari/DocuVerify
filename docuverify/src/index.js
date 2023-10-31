@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { Amplify } from 'aws-amplify';  // <-- Modified this line
-import awsconfig from './aws-exports';  // This file will be automatically created in your project root
+import { Amplify } from 'aws-amplify';
+import awsconfig from './aws-exports';  
 
 Amplify.configure(awsconfig);
 
