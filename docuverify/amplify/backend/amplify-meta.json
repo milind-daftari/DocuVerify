@@ -40,7 +40,7 @@
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-docuverify-dev-143516-deployment/amplify-cfn-templates/auth/docuverify4213fd4f-cloudformation-template.json",
         "logicalId": "authdocuverify4213fd4f"
       },
-      "lastPushTimeStamp": "2023-10-31T19:03:07.843Z",
+      "lastPushTimeStamp": "2023-10-31T19:21:16.847Z",
       "output": {
         "UserPoolId": "us-east-1_c2tFENmR9",
         "AppClientIDWeb": "48pnfs4l19r44dllksj8qd64ep",
@@ -58,7 +58,7 @@
       "service": "S3",
       "providerPlugin": "awscloudformation",
       "dependsOn": [],
-      "lastPushTimeStamp": "2023-10-31T19:03:08.116Z",
+      "lastPushTimeStamp": "2023-10-31T19:21:16.848Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-docuverify-dev-143516-deployment/amplify-cfn-templates/storage/cloudformation-template.json",
         "logicalId": "storagedocuverifyUploads"
@@ -70,18 +70,5 @@
       "lastPushDirHash": "XE5zYAHaf3t7/7C3bpeStRRcp1s="
     }
   },
-  "hosting": {
-    "amplifyhosting": {
-      "service": "amplifyhosting",
-      "providerPlugin": "awscloudformation",
-      "type": "manual",
-      "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-docuverify-dev-143516-deployment/amplify-cfn-templates/hosting/amplifyhosting-template.json",
-        "logicalId": "hostingamplifyhosting"
-      },
-      "lastPushTimeStamp": "2023-10-31T19:03:07.845Z",
-      "output": {},
-      "lastPushDirHash": "+6AFnqNz/fB4AGJ9Xan4ycp4ZPs="
-    }
-  }
+  "hosting": {}
 }

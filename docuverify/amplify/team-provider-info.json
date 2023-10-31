@@ -17,12 +17,6 @@
       },
       "storage": {
         "docuverifyUploads": {}
-      },
-      "hosting": {
-        "amplifyhosting": {
-          "appId": "d33l588aykx8u4",
-          "type": "manual"
-        }
       }
     }
   }
