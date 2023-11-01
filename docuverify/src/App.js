@@ -5,6 +5,7 @@ import NavbarComponent from './components/NavbarComponents';
 import Home from './components/Home';
 import Upload from './components/Upload';
 import Verify from './components/Verify';
+import { Auth } from 'aws-amplify';
 
 function App() {
     const initialAccount = localStorage.getItem('connectedAccount');
@@ -23,7 +24,9 @@ function App() {
     };
 
     const handleDisconnect = () => {
-        setAccount(null);
+        Auth.signOut()
+            .then(() => setAccount(null))
+            .catch(err => console.error('Error signing out of Cognito:', err));
     };
 
     const isConnected = Boolean(account);

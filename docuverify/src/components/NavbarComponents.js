@@ -3,12 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { Navbar, Nav, Button, Container } from 'react-bootstrap';
 
 function NavbarComponent({ isConnected, onConnect, onDisconnect }) {
-    useEffect(() => {
-        if (window.ethereum && !window.ethereum.selectedAddress && isConnected) {
-            onDisconnect();  // Disconnect if user is not connected to their wallet
-        }
-    }, [isConnected, onDisconnect]);
-
+    
     const connectWallet = async () => {
         if (window.ethereum) {
             try {
@@ -22,11 +17,23 @@ function NavbarComponent({ isConnected, onConnect, onDisconnect }) {
         }
     };
 
-    const disconnectWallet = () => {
+    useEffect(() => {
+        const handleAccountsChanged = (accounts) => {
+            if (accounts.length === 0) {
+                onDisconnect();
+            }
+        };
+
         if (window.ethereum) {
-            onDisconnect();
+            window.ethereum.on('accountsChanged', handleAccountsChanged);
         }
-    };
+
+        return () => {
+            if (window.ethereum) {
+                window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+            }
+        };
+    }, [onDisconnect]);
 
     return (
         <Navbar style={{ backgroundColor: '#ADD8E6' }} fixed="top">
@@ -44,13 +51,13 @@ function NavbarComponent({ isConnected, onConnect, onDisconnect }) {
                         </Nav>
                     )}
                 </div>
-                <Nav>
-                    {isConnected ? (
-                        <Button variant="outline-primary" onClick={disconnectWallet}>Disconnect</Button>
-                    ) : (
-                        <Button variant="primary" onClick={connectWallet}>Connect to MetaMask</Button>
-                    )}
-                </Nav>
+                    <Nav className="ml-auto">
+                        {isConnected ? (
+                            <Button variant="outline-primary" disabled>Connected to MetaMask</Button>
+                        ) : (
+                            <Button variant="primary" onClick={connectWallet}>Connect to MetaMask</Button>
+                        )}
+                    </Nav>
             </Container>
         </Navbar>
     );
