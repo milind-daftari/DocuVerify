@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getBalance, getNetworkName } from '../utility/blockchain'; // Ensure the path is correct
+import { getBalance, getNetworkName } from '../utility/blockchain'; 
 
 function Home({ account }) {
     const [balance, setBalance] = useState(null);
@@ -22,20 +22,19 @@ function Home({ account }) {
     }, [account]);
 
     return (
-    <div className="container" style={{ marginTop: '4rem' }}>
-        {account ? (
-            <>
-                <h2>Welcome to DocuVerify</h2>
-                <p>Hi, {account}</p>
-                {balance !== null && <p>Your balance: {balance}</p>}
-                {networkName && <p>Network: {networkName}</p>}
-            </>
-        ) : (
-            <p>Please connect with your wallet.</p>
-        )}
-    </div>
-);
-
+        <div className="container" style={{ marginTop: '4rem' }}>
+            {account ? (
+                <>
+                    <h2>Welcome to DocuVerify</h2>
+                    <p>Hi, {account}</p>
+                    {balance !== null && <p>Your balance: {balance}</p>}
+                    {networkName && <p>Network: {networkName}</p>}
+                </>
+            ) : (
+                <p>Please connect with your wallet.</p>
+            )}
+        </div>
+    );
 }
 
 export default Home;
