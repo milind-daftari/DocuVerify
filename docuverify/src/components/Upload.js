@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Form, Alert, OverlayTrigger, Tooltip, Row, Col } from 'react-bootstrap';
-import { Storage } from 'aws-amplify';
+import { Storage, Auth } from 'aws-amplify';
 
 function Upload() {
     const [error, setError] = useState('');
@@ -13,10 +13,13 @@ function Upload() {
             setError('Please select a valid file.');
             return;
         }
+        
+        const user = await Auth.currentAuthenticatedUser();
+        const userFolder = user.username;
 
         try {
             setUploading(true);
-            await Storage.put(selectedFile.name, selectedFile, {
+            await Storage.put(`${userFolder}/${selectedFile.name}`, selectedFile, {
                 contentType: selectedFile.type,
                 metadata: { description: documentDescription }
             });
@@ -30,8 +33,7 @@ function Upload() {
             }
         } finally {
             setUploading(false);
-        }
-        
+        }   
     };
 
     const handleDescriptionChange = (e) => {
@@ -43,14 +45,12 @@ function Upload() {
         if (file) {
             const fileName = file.name;
 
-            // Allow alphanumeric characters along with -, _, and dots in the filename
             if (!/^[a-zA-Z0-9.-_]+$/.test(fileName)) {
                 setError('File name should only have alphanumeric characters, hyphens, underscores, and dots.');
                 e.target.value = '';
                 return;
             }
 
-             // Check file size, for example, limiting to 5MB
             if (file.size > 5 * 1024 * 1024) {
                 setError('File size exceeds the 5MB limit.');
                 e.target.value = '';
@@ -65,13 +65,13 @@ function Upload() {
             }
 
             setError('');
-            setSelectedFile(file);  // Set the file for later upload
+            setSelectedFile(file); 
         }
     };
 
     const handleSubmit = (e) => {
-        e.preventDefault(); // prevent default form submission
-        handleFileUpload();  // Upload the file upon submit
+        e.preventDefault(); 
+        handleFileUpload(); 
     };
 
     return (
