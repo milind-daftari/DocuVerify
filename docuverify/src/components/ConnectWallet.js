@@ -1,8 +1,12 @@
+import React from 'react';
+import { authenticateWithCognito } from './MetaMaskAuth';
+
 function ConnectWallet({ onConnect, onDisconnect, account }) {
     const connectWallet = async () => {
         if (typeof window.ethereum !== 'undefined') {
             try {
                 const [selectedAccount] = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                await authenticateWithCognito(selectedAccount);  // Authenticate with Cognito
                 onConnect(selectedAccount);
             } catch (error) {
                 console.error('User rejected request:', error);
