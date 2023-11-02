@@ -18,20 +18,15 @@ function Upload() {
             setUploading(true);
             await Storage.put(selectedFile.name, selectedFile, {
                 contentType: selectedFile.type,
-                metadata: { description: documentDescription }
+                metadata: { description: documentDescription }  // Add the description as metadata
             });
             alert('File uploaded successfully');
         } catch (err) {
             console.error('Error uploading the file: ', err);
-            if (err && err.message) {
-                setError(err.message);
-            } else {
-                setError('Error uploading the file');
-            }
+            setError('Error uploading the file');
         } finally {
             setUploading(false);
         }
-        
     };
 
     const handleDescriptionChange = (e) => {
@@ -46,13 +41,6 @@ function Upload() {
             // Allow alphanumeric characters along with -, _, and dots in the filename
             if (!/^[a-zA-Z0-9.-_]+$/.test(fileName)) {
                 setError('File name should only have alphanumeric characters, hyphens, underscores, and dots.');
-                e.target.value = '';
-                return;
-            }
-
-             // Check file size, for example, limiting to 5MB
-            if (file.size > 5 * 1024 * 1024) {
-                setError('File size exceeds the 5MB limit.');
                 e.target.value = '';
                 return;
             }
