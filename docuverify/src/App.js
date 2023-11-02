@@ -1,3 +1,4 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavbarComponent from './components/NavbarComponents';
@@ -24,10 +25,7 @@ function App() {
 
     const handleDisconnect = () => {
         Auth.signOut()
-            .then(() => {
-                localStorage.removeItem('connectedAccount');
-                setAccount(null);
-            })
+            .then(() => setAccount(null))
             .catch(err => console.error('Error signing out of Cognito:', err));
     };
 

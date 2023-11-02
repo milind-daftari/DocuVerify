@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Navbar, Nav, Button, Container } from 'react-bootstrap';
-import { authenticateWithCognito } from '../utility/cognitoAuth';
 
 function NavbarComponent({ isConnected, onConnect, onDisconnect }) {
     
@@ -9,7 +8,6 @@ function NavbarComponent({ isConnected, onConnect, onDisconnect }) {
         if (window.ethereum) {
             try {
                 const [selectedAccount] = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                await authenticateWithCognito(selectedAccount);
                 onConnect(selectedAccount);
             } catch (error) {
                 console.error("Failed to connect wallet", error);
@@ -53,13 +51,13 @@ function NavbarComponent({ isConnected, onConnect, onDisconnect }) {
                         </Nav>
                     )}
                 </div>
-                <Nav className="ml-auto">
-                    {isConnected ? (
-                        <Button variant="outline-primary" disabled>Connected to MetaMask</Button>
-                    ) : (
-                        <Button variant="primary" onClick={connectWallet}>Connect to MetaMask</Button>
-                    )}
-                </Nav>
+                    <Nav className="ml-auto">
+                        {isConnected ? (
+                            <Button variant="outline-primary" disabled>Connected to MetaMask</Button>
+                        ) : (
+                            <Button variant="primary" onClick={connectWallet}>Connect to MetaMask</Button>
+                        )}
+                    </Nav>
             </Container>
         </Navbar>
     );
