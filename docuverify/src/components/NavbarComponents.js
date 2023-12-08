@@ -1,54 +1,35 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Navbar, Nav, Button, Container } from 'react-bootstrap';
 
-function NavbarComponent({ isConnected, onConnect, onDisconnect }) {
-    useEffect(() => {
-        if (window.ethereum && !window.ethereum.selectedAddress && isConnected) {
-            onDisconnect();  // Disconnect if user is not connected to their wallet
-        }
-    }, [isConnected, onDisconnect]);
-
-    const connectWallet = async () => {
-        if (window.ethereum) {
-            try {
-                const [selectedAccount] = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                onConnect(selectedAccount);
-            } catch (error) {
-                console.error("Failed to connect wallet", error);
-            }
-        } else {
-            console.log("Ethereum provider is not available");
-        }
-    };
-
-    const disconnectWallet = () => {
-        if (window.ethereum) {
-            onDisconnect();
-        }
-    };
+function NavbarComponent({ isConnected, onConnect, onDisconnect, isCognitoAuthenticated, onSignOut }) {
 
     return (
         <Navbar style={{ backgroundColor: '#ADD8E6' }} fixed="top">
             <Container fluid className="d-flex justify-content-between align-items-center">
-                <div className="d-flex align-items-center">
-                    <Navbar.Brand as={Link} to="/">DocuVerify</Navbar.Brand>
-                    {isConnected && (
-                        <Nav className="mr-auto">
-                            <Nav.Item as="li">
-                                <NavLink to="/upload" className="nav-link">Upload</NavLink>
-                            </Nav.Item>
-                            <Nav.Item as="li">
-                                <NavLink to="/verify" className="nav-link">Verify</NavLink>
-                            </Nav.Item>
-                        </Nav>
-                    )}
-                </div>
+                <Navbar.Brand as={Link} to="/">DocuVerify</Navbar.Brand>
+                {isCognitoAuthenticated && isConnected && (
+                    <Nav className="me-auto">
+                        <Nav.Link as={NavLink} to="/upload">Upload</Nav.Link>
+                        <Nav.Link as={NavLink} to="/verify">Verify</Nav.Link>
+                    </Nav>
+                )}
                 <Nav>
-                    {isConnected ? (
-                        <Button variant="outline-primary" onClick={disconnectWallet}>Disconnect</Button>
+                    {isCognitoAuthenticated ? (
+                        <>
+                            {isConnected ? (
+                                <Button variant="outline-secondary" onClick={onDisconnect} className="me-2">
+                                    Disconnect MetaMask
+                                </Button>
+                            ) : (
+                                <Button variant="primary" onClick={onConnect} className="me-2">
+                                    Connect to MetaMask
+                                </Button>
+                            )}
+                            <Button variant="outline-danger" onClick={onSignOut}>Logout</Button>
+                        </>
                     ) : (
-                        <Button variant="primary" onClick={connectWallet}>Connect to MetaMask</Button>
+                        <Button variant="primary" onClick={onConnect}>Connect to MetaMask</Button>
                     )}
                 </Nav>
             </Container>
