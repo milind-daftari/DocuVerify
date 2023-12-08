@@ -10,8 +10,8 @@ function NavbarComponent({ isConnected, onConnect, onDisconnect, isCognitoAuthen
                 <Navbar.Brand as={Link} to="/">DocuVerify</Navbar.Brand>
                 {isCognitoAuthenticated && isConnected && (
                     <Nav className="me-auto">
-                        <Nav.Link as={NavLink} to="/upload">Upload</Nav.Link>
-                        <Nav.Link as={NavLink} to="/verify">Verify</Nav.Link>
+                        <Nav.Link as={NavLink} to="/upload/">Upload</Nav.Link>
+                        <Nav.Link as={NavLink} to="/verify/">Verify</Nav.Link>
                     </Nav>
                 )}
                 <Nav>
