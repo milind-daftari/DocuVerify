@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { Authenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import NavbarComponent from './components/NavbarComponents';
 import Home from './components/Home';
 import Upload from './components/Upload';
@@ -71,18 +72,12 @@ function App() {
     };
 
     return (
-        <Authenticator signUpAttributes={[
-            'email',
-            'name',
-            'family_name',
-            'birthdate',
-            'gender',
-          ]}>
+        <Authenticator signUpAttributes={['email', 'name', 'family_name', 'birthdate', 'gender']}>
             {({ signOut, user }) => {
                 setIsCognitoAuthenticated(!!user);
                 return (
                     <Router>
-                        <NavbarComponent 
+                        <NavbarComponent
                             isConnected={!!account}
                             onConnect={handleConnect}
                             onDisconnect={handleDisconnect}
