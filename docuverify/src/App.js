@@ -90,8 +90,8 @@ function App() {
                         <div className="app-container">
                             <Routes>
                                 <Route path="/" element={<Home account={account} />} exact />
-                                <Route path="/upload" element={isCognitoAuthenticated && account ? <Upload /> : <p>Please connect with your wallet.</p>} />
-                                <Route path="/verify" element={isCognitoAuthenticated && account ? <Verify /> : <p>Please connect with your wallet.</p>} />
+                                <Route path="/upload" element={isCognitoAuthenticated && account ? <Upload user={{ metaMaskAddress: account, username: user?.username }} /> : <p>Please connect with your wallet.</p>} />
+                                <Route path="/verify" element={isCognitoAuthenticated && account ? <Verify user={{ metaMaskAddress: account, username: user?.username }} /> : <p>Please connect with your wallet.</p>} />
                             </Routes>
                         </div>
                     </Router>
