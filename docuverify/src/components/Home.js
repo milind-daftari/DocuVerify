@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { getBalance, getNetworkName } from '../utility/blockchain'; // Ensure the path is correct
+import { Card, Container, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { getBalance, getNetworkName } from '../utility/blockchain'; // Adjust the import path as necessary
 
 function Home({ account }) {
     const [balance, setBalance] = useState(null);
     const [networkName, setNetworkName] = useState("");
 
     useEffect(() => {
-        const fetchDetails = async () => {
+        const fetchAccountDetails = async () => {
             if (account) {
                 try {
                     const accountBalance = await getBalance(account);
@@ -18,24 +19,34 @@ function Home({ account }) {
                 }
             }
         };
-        fetchDetails();
+
+        fetchAccountDetails();
     }, [account]);
 
     return (
-    <div className="container" style={{ marginTop: '4rem' }}>
-        {account ? (
-            <>
-                <h2>Welcome to DocuVerify</h2>
-                <p>Hi, {account}</p>
-                {balance !== null && <p>Your balance: {balance}</p>}
-                {networkName && <p>Network: {networkName}</p>}
-            </>
-        ) : (
-            <p>Please connect with your wallet.</p>
-        )}
-    </div>
-);
-
+        <Container className="my-5">
+            <Card className="text-center shadow">
+                <Card.Header as="h5" className="bg-primary text-white">Welcome to DocuVerify</Card.Header>
+                <Card.Body>
+                    {account ? (
+                        <>
+                            <Card.Title>Hi, {account}</Card.Title>
+                            <ListGroup className="list-group-flush">
+                                {balance !== null && (
+                                    <ListGroupItem>Your balance: {balance}</ListGroupItem>
+                                )}
+                                {networkName && (
+                                    <ListGroupItem>Network: {networkName}</ListGroupItem>
+                                )}
+                            </ListGroup>
+                        </>
+                    ) : (
+                        <Card.Text>Please connect with your wallet.</Card.Text>
+                    )}
+                </Card.Body>
+            </Card>
+        </Container>
+    );
 }
 
 export default Home;
