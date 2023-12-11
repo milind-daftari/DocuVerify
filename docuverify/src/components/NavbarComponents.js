@@ -1,39 +1,39 @@
 import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { Navbar, Nav, Button, Container } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import { Flex, Button, Image } from '@aws-amplify/ui-react';
 
 function NavbarComponent({ isConnected, onConnect, onDisconnect, isCognitoAuthenticated, onSignOut }) {
-
     return (
-        <Navbar style={{ backgroundColor: '#ADD8E6' }} fixed="top">
-            <Container fluid className="d-flex justify-content-between align-items-center">
-                <Navbar.Brand as={Link} to="/">DocuVerify</Navbar.Brand>
-                {isCognitoAuthenticated && isConnected && (
-                    <Nav className="me-auto">
-                        <Nav.Link as={NavLink} to="/upload">Upload</Nav.Link>
-                        <Nav.Link as={NavLink} to="/verify">Verify</Nav.Link>
-                    </Nav>
+        <Flex as="nav" justifyContent="space-between" padding="15px" backgroundColor="#ADD8E6" position="fixed" width="100%">
+            <Flex gap="10px" alignItems="center">
+                <Link to="/">
+                    <Image src={`${process.env.PUBLIC_URL}/logo.png`} alt="DocuVerify Logo" width="50px" />
+                </Link>
+                {isCognitoAuthenticated && (
+                    <>
+                        <Button variation="link" as={Link} to="/">Home</Button>
+                        {isConnected && (
+                            <>
+                                <Button variation="link" as={Link} to="/upload">Upload</Button>
+                                <Button variation="link" as={Link} to="/verify">Verify</Button>
+                            </>
+                        )}
+                    </>
                 )}
-                <Nav>
-                    {isCognitoAuthenticated ? (
-                        <>
-                            {isConnected ? (
-                                <Button variant="outline-secondary" onClick={onDisconnect} className="me-2">
-                                    Disconnect MetaMask
-                                </Button>
-                            ) : (
-                                <Button variant="primary" onClick={onConnect} className="me-2">
-                                    Connect to MetaMask
-                                </Button>
-                            )}
-                            <Button variant="outline-danger" onClick={onSignOut}>Logout</Button>
-                        </>
-                    ) : (
-                        <Button variant="primary" onClick={onConnect}>Connect to MetaMask</Button>
-                    )}
-                </Nav>
-            </Container>
-        </Navbar>
+            </Flex>
+            <Flex>
+                {isCognitoAuthenticated && (
+                    <>
+                        {isConnected ? (
+                            <Button variation="primary" onClick={onDisconnect}>Disconnect MetaMask</Button>
+                        ) : (
+                            <Button variation="primary" onClick={onConnect}>Connect to MetaMask</Button>
+                        )}
+                        <Button variation="primary" onClick={onSignOut}>Logout</Button>
+                    </>
+                )}
+            </Flex>
+        </Flex>
     );
 }
 
