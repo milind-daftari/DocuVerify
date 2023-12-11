@@ -4,29 +4,13 @@ import { Storage } from 'aws-amplify';
 
 function Upload() {
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const [uploading, setUploading] = useState(false);
     const [documentDescription, setDocumentDescription] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
 
     const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const fileName = file.name;
-            // Validation checks
-            if (!/^[a-zA-Z0-9.-_]+$/.test(fileName)) {
-                setError('File name should only have alphanumeric characters, hyphens, underscores, and dots.');
-                e.target.value = '';
-                return;
-            }
-            const fileExtension = fileName.split('.').pop().toLowerCase();
-            if (fileExtension !== 'pdf') {
-                setError('Invalid file type. Please upload a PDF.');
-                e.target.value = '';
-                return;
-            }
-            setError('');
-            setSelectedFile(file);
-        }
+        setSelectedFile(e.target.files[0]);
     };
 
     const handleDescriptionChange = (e) => {
@@ -36,15 +20,26 @@ function Upload() {
     const handleFileUpload = async () => {
         if (!selectedFile) {
             setError('Please select a valid file.');
+            setSuccess('');
             return;
         }
+        setError('');
         setUploading(true);
         try {
-            // Storage.put logic
-            alert('File uploaded successfully');
+            const result = await Storage.put(selectedFile.name, selectedFile, {
+                contentType: selectedFile.type,
+                metadata: { description: documentDescription }
+            });
+            console.log(result); // For debugging purposes
+            setSuccess('Upload successful!');
+            // Clear the form data
+            setSelectedFile(null);
+            setDocumentDescription('');
+            setError('');
         } catch (err) {
             console.error('Error uploading the file: ', err);
-            setError('Error uploading the file');
+            setError('Upload failed. Please try again.');
+            setSuccess('');
         } finally {
             setUploading(false);
         }
@@ -62,6 +57,7 @@ function Upload() {
                     <Card className="shadow-sm p-4">
                         <Card.Body>
                             <h5 className="text-center mb-4">Upload Document</h5>
+                            {success && <Alert variant="success">{success}</Alert>}
                             {error && <Alert variant="danger">{error}</Alert>}
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group className="mb-3" controlId="formFile">
@@ -77,6 +73,7 @@ function Upload() {
                                         value={documentDescription}
                                         onChange={handleDescriptionChange}
                                         maxLength={128}
+                                        disabled={uploading}
                                     />
                                 </Form.Group>
                                 <div className="d-grid">
