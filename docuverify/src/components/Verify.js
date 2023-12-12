@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Button, Form, Alert, OverlayTrigger, Tooltip, Card, Row, Col } from 'react-bootstrap';
-import { Storage } from 'aws-amplify';
+import { Storage, API } from 'aws-amplify';
 import { v4 as uuidv4 } from 'uuid';
 
 function Verify({ user }) {
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
     const [metaMaskAddressToValidate, setMetaMaskAddressToValidate] = useState('');
-    const [success, setSuccess] = useState('');
 
     const isMetaMaskAddressValid = (address) => {
         const regex = /^0x[a-fA-F0-9]{40}$/;
@@ -18,15 +18,12 @@ function Verify({ user }) {
         const file = e.target.files[0];
         if (file) {
             const fileName = file.name;
-
-            // Check for valid file name
             if (!/^[a-zA-Z0-9.-_]+$/.test(fileName)) {
                 setError('File name should only have alphanumeric characters, hyphens, underscores, and dots.');
                 e.target.value = '';
                 return;
             }
 
-            // Check for valid file type (PDF)
             const fileExtension = fileName.split('.').pop().toLowerCase();
             if (fileExtension !== 'pdf') {
                 setError('Invalid file type. Please upload a PDF.');
@@ -34,7 +31,6 @@ function Verify({ user }) {
                 return;
             }
 
-            // Check for file size (5MB limit)
             if (file.size > 5242880) {
                 setError('File size should not exceed 5MB.');
                 e.target.value = '';
@@ -76,10 +72,28 @@ function Verify({ user }) {
                     toValidateFor: metaMaskAddressToValidate
                 }
             });
-            setError('');
+
+            const metadata = {
+                documentId: uniqueFileName,
+                originalFileName: selectedFile.name,
+                uploadTimestamp: new Date().toISOString(),
+                username: user.username,
+                userAddress: user.metaMaskAddress,
+                toValidateFor: metaMaskAddressToValidate,
+                source: 'Verify',
+                isVerified: false
+            };
+            await API.post('Document', '/upload-metadata', {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(metadata)
+            });
+
             setSuccess('File uploaded for verification.');
             setSelectedFile(null);
             setMetaMaskAddressToValidate('');
+            setError('');
         } catch (err) {
             console.error('Error uploading the file for verification: ', err);
             setError('Error uploading the file for verification.');

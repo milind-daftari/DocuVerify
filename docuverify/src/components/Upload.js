@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Form, Alert, OverlayTrigger, Tooltip, Row, Col } from 'react-bootstrap';
-import { Storage } from 'aws-amplify';
+import { Storage, API } from 'aws-amplify';
 import { v4 as uuidv4 } from 'uuid';
 
 function Upload({ user }) {
@@ -14,7 +14,6 @@ function Upload({ user }) {
         const file = e.target.files[0];
         if (file) {
             const fileName = file.name;
-
             if (!/^[a-zA-Z0-9.-_]+$/.test(fileName)) {
                 setError('File name should only have alphanumeric characters, hyphens, underscores, and dots.');
                 e.target.value = '';
@@ -55,10 +54,29 @@ function Upload({ user }) {
                     originalFileName: selectedFile.name,
                     uploadTimestamp: new Date().toISOString(),
                     username: user.username,
-                    metamaskAddress: user.metaMaskAddress,
-                    fileSize: selectedFile.size.toString()
+                    userAddress: user.metaMaskAddress,
+                    fileSize: selectedFile.size.toString(),
                 }
             });
+
+            const metadata = {
+                documentId: uniqueFileName,
+                originalFileName: selectedFile.name,
+                uploadTimestamp: new Date().toISOString(),
+                username: user.username,
+                userAddress: user.metaMaskAddress,
+                fileSize: selectedFile.size.toString(),
+                source: 'Upload',
+                isVerified: '',
+                toValidateFor: ''
+            };
+            await API.post('Document', '/upload-metadata', {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(metadata)
+            });
+
             setSuccess('Upload successful!');
             setSelectedFile(null);
             setDocumentDescription('');
