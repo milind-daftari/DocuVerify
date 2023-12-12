@@ -83,11 +83,11 @@ function Verify({ user }) {
                 source: 'Verify',
                 isVerified: false
             };
-            await API.post('Document', '/upload-metadata', {
+            await API.post('documentAPI', '/upload-metadata', {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(metadata)
+                body: metadata
             });
 
             setSuccess('File uploaded for verification.');
