@@ -14,7 +14,7 @@ function History({ user }) {
             setError('');
 
             try {
-                const response = await API.get('Document', `/documents/${user.username}`);
+                const response = await API.get('documentAPI', `/documents/${user.username}`);
                 console.log('API Response:', response); // Debugging line
 
                 // Check if the response is an array
