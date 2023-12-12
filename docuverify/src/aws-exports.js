@@ -25,7 +25,16 @@ const awsmobile = {
         "EMAIL"
     ],
     "aws_user_files_s3_bucket": "docuverify143516-dev",
-    "aws_user_files_s3_bucket_region": "us-east-1"
+    "aws_user_files_s3_bucket_region": "us-east-1",
+
+    API: {
+        endpoints: [
+            {
+                name: "Document",
+                endpoint: "https://yor2zjs4k8.execute-api.us-west-2.amazonaws.com/dev"
+            }
+        ]
+    }
 };
 
 

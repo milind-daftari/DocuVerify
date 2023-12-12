@@ -7,6 +7,7 @@ import NavbarComponent from './components/NavbarComponents';
 import Home from './components/Home';
 import Upload from './components/Upload';
 import Verify from './components/Verify';
+import History from './components/History';
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
 import './App.css';
@@ -92,6 +93,7 @@ function App() {
                                 <Route path="/" element={<Home account={account} />} exact />
                                 <Route path="/upload" element={isCognitoAuthenticated && account ? <Upload user={{ metaMaskAddress: account, username: user?.username }} /> : <p>Please connect with your wallet.</p>} />
                                 <Route path="/verify" element={isCognitoAuthenticated && account ? <Verify user={{ metaMaskAddress: account, username: user?.username }} /> : <p>Please connect with your wallet.</p>} />
+                                <Route path="/history" element={isCognitoAuthenticated && account ? <History user={{ username: user?.username }} /> : <p>Please log in to view your history.</p>} />
                             </Routes>
                         </div>
                     </Router>
