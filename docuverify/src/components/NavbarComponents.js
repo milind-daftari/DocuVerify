@@ -16,6 +16,7 @@ function NavbarComponent({ isConnected, onConnect, onDisconnect, isCognitoAuthen
                             <>
                                 <Button variation="link" as={Link} to="/upload">Upload</Button>
                                 <Button variation="link" as={Link} to="/verify">Verify</Button>
+                                <Button variation="link" as={Link} to="/history">History</Button>
                             </>
                         )}
                     </>
