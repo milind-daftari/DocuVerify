@@ -30,7 +30,7 @@ function History({ user }) {
         if (user && user.username) {
             fetchDocuments();
         }
-    }, [user.username]);
+    }, [user]);
 
     const filteredDocuments = documents.filter(doc => 
         selectedOption === 'uploaded' ? doc.source === 'Upload' : doc.source === 'Verify'
@@ -64,6 +64,7 @@ function History({ user }) {
                                 <tr>
                                     <th>File Name</th>
                                     <th>Upload Timestamp</th>
+                                    {selectedOption === 'uploaded' && <th>Description</th>}
                                     {selectedOption === 'verified' && <>
                                         <th>MetaMask Address to Validate</th>
                                         <th>Is Verified</th>
@@ -75,6 +76,7 @@ function History({ user }) {
                                     <tr key={index}>
                                         <td>{doc.originalFileName}</td>
                                         <td>{new Date(doc.uploadTimestamp).toLocaleString()}</td>
+                                        {selectedOption === 'uploaded' && <td>{doc.description}</td>}
                                         {selectedOption === 'verified' && <>
                                             <td>{doc.toValidateFor}</td>
                                             <td>{doc.isVerified ? 'Yes' : 'No'}</td>

@@ -62,6 +62,7 @@ function Upload({ user }) {
             const metadata = {
                 documentId: uniqueFileName,
                 originalFileName: selectedFile.name,
+                description: documentDescription,
                 uploadTimestamp: new Date().toISOString(),
                 username: user.username,
                 userAddress: user.metaMaskAddress,
