@@ -25,8 +25,144 @@
       "service": "Cognito"
     }
   },
+  "function": {
+    "Fetch": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributeEnvMap": {
+            "Arn": "TABLE_ARN",
+            "Name": "TABLE_NAME"
+          },
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "storage",
+          "resourceName": "DocumentData"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "Upload": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributeEnvMap": {
+            "Arn": "TABLE_ARN",
+            "Name": "TABLE_NAME"
+          },
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "storage",
+          "resourceName": "DocumentData"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
   "hosting": {},
+  "parameters": {
+    "AMPLIFY_function_Fetch_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "Fetch"
+        }
+      ]
+    },
+    "AMPLIFY_function_Fetch_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "Fetch"
+        }
+      ]
+    },
+    "AMPLIFY_function_Upload_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "Upload"
+        }
+      ]
+    },
+    "AMPLIFY_function_Upload_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "Upload"
+        }
+      ]
+    },
+    "AMPLIFY_storage_DocumentData_arn": {
+      "usedBy": [
+        {
+          "category": "storage",
+          "resourceName": "DocumentData"
+        }
+      ]
+    },
+    "AMPLIFY_storage_DocumentData_partitionKeyName": {
+      "usedBy": [
+        {
+          "category": "storage",
+          "resourceName": "DocumentData"
+        }
+      ]
+    },
+    "AMPLIFY_storage_DocumentData_partitionKeyType": {
+      "usedBy": [
+        {
+          "category": "storage",
+          "resourceName": "DocumentData"
+        }
+      ]
+    },
+    "AMPLIFY_storage_DocumentData_region": {
+      "usedBy": [
+        {
+          "category": "storage",
+          "resourceName": "DocumentData"
+        }
+      ]
+    },
+    "AMPLIFY_storage_DocumentData_sortKeyName": {
+      "usedBy": [
+        {
+          "category": "storage",
+          "resourceName": "DocumentData"
+        }
+      ]
+    },
+    "AMPLIFY_storage_DocumentData_sortKeyType": {
+      "usedBy": [
+        {
+          "category": "storage",
+          "resourceName": "DocumentData"
+        }
+      ]
+    },
+    "AMPLIFY_storage_DocumentData_tableName": {
+      "usedBy": [
+        {
+          "category": "storage",
+          "resourceName": "DocumentData"
+        }
+      ]
+    }
+  },
   "storage": {
+    "DocumentData": {
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "DynamoDB",
+      "serviceType": "imported"
+    },
     "docuverifyUploads": {
       "dependsOn": [],
       "providerPlugin": "awscloudformation",
