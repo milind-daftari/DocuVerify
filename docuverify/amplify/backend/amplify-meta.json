@@ -40,7 +40,7 @@
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-docuverify-dev-143516-deployment/amplify-cfn-templates/auth/docuverify4213fd4f-cloudformation-template.json",
         "logicalId": "authdocuverify4213fd4f"
       },
-      "lastPushTimeStamp": "2023-12-13T05:02:56.525Z",
+      "lastPushTimeStamp": "2023-10-31T19:21:16.847Z",
       "output": {
         "UserPoolId": "us-east-1_c2tFENmR9",
         "AppClientIDWeb": "48pnfs4l19r44dllksj8qd64ep",
@@ -58,7 +58,7 @@
       "service": "S3",
       "providerPlugin": "awscloudformation",
       "dependsOn": [],
-      "lastPushTimeStamp": "2023-12-13T05:02:56.809Z",
+      "lastPushTimeStamp": "2023-10-31T19:21:16.848Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-docuverify-dev-143516-deployment/amplify-cfn-templates/storage/cloudformation-template.json",
         "logicalId": "storagedocuverifyUploads"
@@ -68,105 +68,7 @@
         "Region": "us-east-1"
       },
       "lastPushDirHash": "XE5zYAHaf3t7/7C3bpeStRRcp1s="
-    },
-    "DocumentData": {
-      "service": "DynamoDB",
-      "serviceType": "imported",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [],
-      "output": {
-        "Name": "DocumentData",
-        "Region": "us-east-1",
-        "Arn": "arn:aws:dynamodb:us-east-1:206648566623:table/DocumentData",
-        "PartitionKeyName": "documentId",
-        "PartitionKeyType": "S",
-        "SortKeyName": "username",
-        "SortKeyType": "S"
-      },
-      "lastPushTimeStamp": "2023-12-13T05:02:07.941Z"
     }
   },
-  "hosting": {},
-  "function": {
-    "Upload": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "storage",
-          "resourceName": "DocumentData",
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "attributeEnvMap": {
-            "Name": "TABLE_NAME",
-            "Arn": "TABLE_ARN"
-          }
-        }
-      ],
-      "lastBuildTimeStamp": "2023-12-13T05:00:29.260Z",
-      "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-13T05:00:30.090Z",
-      "distZipFilename": "Upload-524e374442336e4b624c-build.zip",
-      "s3Bucket": {
-        "deploymentBucketName": "amplify-docuverify-dev-143516-deployment",
-        "s3Key": "amplify-builds/Upload-524e374442336e4b624c-build.zip"
-      },
-      "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-docuverify-dev-143516-deployment/amplify-cfn-templates/function/Upload-cloudformation-template.json",
-        "logicalId": "functionUpload"
-      },
-      "lastPushTimeStamp": "2023-12-13T05:02:56.528Z",
-      "output": {
-        "LambdaExecutionRoleArn": "arn:aws:iam::206648566623:role/docuverifyLambdaRole9887c983-dev",
-        "Region": "us-east-1",
-        "Arn": "arn:aws:lambda:us-east-1:206648566623:function:Upload-dev",
-        "Name": "Upload-dev",
-        "LambdaExecutionRole": "docuverifyLambdaRole9887c983-dev"
-      },
-      "lastPushDirHash": "xuRZCb7iO6khlisEH9If7rEy9PY="
-    },
-    "Fetch": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "storage",
-          "resourceName": "DocumentData",
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "attributeEnvMap": {
-            "Name": "TABLE_NAME",
-            "Arn": "TABLE_ARN"
-          }
-        }
-      ],
-      "lastBuildTimeStamp": "2023-12-13T05:00:31.980Z",
-      "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-13T05:00:32.943Z",
-      "distZipFilename": "Fetch-706c474867326b354746-build.zip",
-      "s3Bucket": {
-        "deploymentBucketName": "amplify-docuverify-dev-143516-deployment",
-        "s3Key": "amplify-builds/Fetch-706c474867326b354746-build.zip"
-      },
-      "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-docuverify-dev-143516-deployment/amplify-cfn-templates/function/Fetch-cloudformation-template.json",
-        "logicalId": "functionFetch"
-      },
-      "lastPushTimeStamp": "2023-12-13T05:02:56.529Z",
-      "output": {
-        "LambdaExecutionRoleArn": "arn:aws:iam::206648566623:role/docuverifyLambdaRole56282eb7-dev",
-        "Region": "us-east-1",
-        "Arn": "arn:aws:lambda:us-east-1:206648566623:function:Fetch-dev",
-        "Name": "Fetch-dev",
-        "LambdaExecutionRole": "docuverifyLambdaRole56282eb7-dev"
-      },
-      "lastPushDirHash": "x3GqzCbxsA3Ajr/egavYCz60oQw="
-    }
-  }
+  "hosting": {}
 }
