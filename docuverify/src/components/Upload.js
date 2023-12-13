@@ -63,7 +63,6 @@ function Upload({ user }) {
                 documentId: uniqueFileName,
                 description: documentDescription,
                 originalFileName: selectedFile.name,
-                description: documentDescription,
                 uploadTimestamp: new Date().toISOString(),
                 username: user.username,
                 userAddress: user.metaMaskAddress,
