@@ -40,6 +40,7 @@ exports.handler = async (event) => {
                 documentId: requestBody.documentId,
                 username: requestBody.username,
                 originalFileName: requestBody.originalFileName,
+                description: requestBody.description,
                 uploadTimestamp: requestBody.uploadTimestamp,
                 userAddress: requestBody.userAddress,
                 fileSize: requestBody.fileSize,
