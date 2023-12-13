@@ -16,26 +16,7 @@
         "docuverify4213fd4f": {}
       },
       "storage": {
-        "docuverifyUploads": {},
-        "DocumentData": {
-          "tableName": "DocumentData",
-          "region": "us-east-1",
-          "arn": "arn:aws:dynamodb:us-east-1:206648566623:table/DocumentData",
-          "partitionKeyName": "documentId",
-          "partitionKeyType": "S",
-          "sortKeyName": "username",
-          "sortKeyType": "S"
-        }
-      },
-      "function": {
-        "Upload": {
-          "deploymentBucketName": "amplify-docuverify-dev-143516-deployment",
-          "s3Key": "amplify-builds/Upload-524e374442336e4b624c-build.zip"
-        },
-        "Fetch": {
-          "deploymentBucketName": "amplify-docuverify-dev-143516-deployment",
-          "s3Key": "amplify-builds/Fetch-706c474867326b354746-build.zip"
-        }
+        "docuverifyUploads": {}
       }
     }
   }
