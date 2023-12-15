@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Dropdown, Table, Spinner, Alert } from 'react-bootstrap';
+import { Card, Dropdown, Table, Spinner, Alert, Button } from 'react-bootstrap';
 import { API } from 'aws-amplify';
+import axios from 'axios';
+import FileSaver from 'file-saver';
 
 function History({ user }) {
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [selectedOption, setSelectedOption] = useState('uploaded'); // 'uploaded' or 'verified'
+    const [selectedOption, setSelectedOption] = useState('uploaded');
 
     useEffect(() => {
         const fetchDocuments = async () => {
@@ -14,7 +16,7 @@ function History({ user }) {
             setError('');
 
             try {
-                const response = await API.get('documentAPI', `/documents/${user.username}`);
+                const response = await API.get('documentAPI', `/document/${user.username}`);
                 if (Array.isArray(response)) {
                     setDocuments(response);
                 } else {
@@ -27,14 +29,25 @@ function History({ user }) {
             }
         };
 
-        if (user && user.username) {
-            fetchDocuments();
-        }
-    }, [user]);
+        fetchDocuments();
+    }, [user.username, user]);
 
-    const filteredDocuments = documents.filter(doc => 
-        selectedOption === 'uploaded' ? doc.source === 'Upload' : doc.source === 'Verify'
-    );
+    const handleDownload = async (documentId, source) => {
+        try {
+            // Using AWS Amplify to make the GET request
+            const presignedUrlResponse = await API.get('documentAPI', `/download?documentId=${documentId}&source=${source}`);
+    
+            // Assuming the response contains a URL in the format { url: "your_presigned_url_here" }
+            const presignedUrl = presignedUrlResponse.url;
+    
+            const response = await axios.get(presignedUrl, { responseType: 'blob' });
+            FileSaver.saveAs(response.data, documentId);
+        } catch (error) {
+            console.error('Error downloading the document:', error);
+            setError('Error downloading the document. Please try again.');
+        }
+    };
+    
 
     return (
         <div className="container mt-5">
@@ -69,10 +82,13 @@ function History({ user }) {
                                         <th>MetaMask Address to Validate</th>
                                         <th>Is Verified</th>
                                     </>}
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredDocuments.map((doc, index) => (
+                                {documents.filter(doc => 
+                                    selectedOption === 'uploaded' ? doc.source === 'Upload' : doc.source === 'Verify'
+                                ).map((doc, index) => (
                                     <tr key={index}>
                                         <td>{doc.originalFileName}</td>
                                         <td>{new Date(doc.uploadTimestamp).toLocaleString()}</td>
@@ -81,6 +97,11 @@ function History({ user }) {
                                             <td>{doc.toValidateFor}</td>
                                             <td>{doc.isVerified ? 'Yes' : 'No'}</td>
                                         </>}
+                                        <td>
+                                            <Button variant="primary" onClick={() => handleDownload(doc.documentId, doc.source)}>
+                                                Download
+                                            </Button>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
