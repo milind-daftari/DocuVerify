@@ -31,7 +31,7 @@ const awsmobile = {
         endpoints: [
             {
                 name: "documentAPI",
-                endpoint: "https://r61fca0nvc.execute-api.us-east-1.amazonaws.com/dev"
+                endpoint: "https://27titywyu2.execute-api.us-east-1.amazonaws.com/dev"
             }
         ]
     }

@@ -70,7 +70,10 @@ function Verify({ user }) {
                     username: user.username,
                     userAddress: user.metaMaskAddress,
                     toValidateFor: metaMaskAddressToValidate
-                }
+                },
+                // Server-side encryption with AWS KMS
+                serverSideEncryption: "aws:kms",
+                SSEKMSKeyId: "f9c61645-afb9-4ce7-97c7-d5dc95ba18ce"
             });
 
             const metadata = {
