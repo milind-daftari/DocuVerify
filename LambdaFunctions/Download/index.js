@@ -31,7 +31,7 @@ exports.handler = async (event) => {
         }
 
         // Determine the S3 path based on source
-        const filePath = source === 'Upload' ? `public/${documentId}` : `public/tmp/${documentId}`;
+        const filePath = source === 'Upload' ? `public/${documentId}` : `public/${documentId}`;
 
         // Generate the pre-signed URL
         const url = s3.getSignedUrl('getObject', {
