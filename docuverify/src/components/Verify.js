@@ -57,26 +57,28 @@ function Verify({ user }) {
         }
 
         try {
-            const docHash = hash(selectedFile);
-            const fileName = `${uuidv4()}_${docHash}`;
+            const docHash = hash(selectedFile); // Hash the document
             const verificationResult = await verify(docHash, metaMaskAddressToValidate);
 
+            // Determine verification status
+            const verificationStatus = verificationResult.verified ? 'Verified' : 'Verification Failed';
+
             const metadata = {
-                documentId: fileName,
+                documentId: `${uuidv4()}_${docHash}`,
                 originalFileName: selectedFile.name,
                 uploadTimestamp: new Date().toISOString(),
                 username: user.username,
                 userAddress: user.metaMaskAddress,
                 toValidateFor: metaMaskAddressToValidate,
                 source: 'Verify',
-                verificationStatus: verificationResult.status
+                isVerified: verificationStatus
             };
             await API.post('documentAPI', '/upload-metadata', {
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(metadata)
+                body: metadata
             });
 
-            setSuccess('File uploaded for verification.');
+            setSuccess(`Verification Status: ${verificationStatus}`);
             setSelectedFile(null);
             setMetaMaskAddressToValidate('');
         } catch (err) {

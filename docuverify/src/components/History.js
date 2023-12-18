@@ -13,6 +13,7 @@ function History({ user }) {
     useEffect(() => {
         const fetchDocuments = async () => {
             setLoading(true);
+            setError('');
             try {
                 const response = await API.get('documentAPI', `/document/${user.username}`);
                 if (Array.isArray(response)) {
@@ -28,8 +29,6 @@ function History({ user }) {
         };
 
         fetchDocuments();
-        // const intervalId = setInterval(fetchDocuments, 30000); // Polling every 30 seconds
-        // return () => clearInterval(intervalId);
     }, [user.username]);
 
     const handleDownload = async (documentId) => {
@@ -72,6 +71,7 @@ function History({ user }) {
                                 <tr>
                                     <th>File Name</th>
                                     <th>Upload Timestamp</th>
+                                    {selectedOption === 'verified' && <th>Validated for Address</th>}
                                     <th>Status</th>
                                     {selectedOption === 'uploaded' && <th>Actions</th>}
                                 </tr>
@@ -81,11 +81,12 @@ function History({ user }) {
                                     <tr key={index}>
                                         <td>{doc.originalFileName}</td>
                                         <td>{new Date(doc.uploadTimestamp).toLocaleString()}</td>
+                                        {selectedOption === 'verified' && <td>{doc.toValidateFor}</td>}
                                         <td>
-                                            {doc.source === 'Verify' ? (
+                                            {selectedOption === 'Verify' ? (
                                                 doc.verificationStatus === 'Verified' ? 'Document Verified' :
-                                                doc.verificationStatus === 'In Progress' ? 'Verification In Progress' :
-                                                'Verification Pending'
+                                                doc.verificationStatus === 'Verification Failed' ? 'Verification Failed' :
+                                                'Verification In Progress'
                                             ) : (
                                                 'Uploaded'
                                             )}

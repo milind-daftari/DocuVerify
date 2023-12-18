@@ -8,20 +8,17 @@ export async function registerDocument(docHash) {
     const formattedFee = parseEther('0.0001').toString();
 
     try {
-        const transaction = await contract.registerDocument(docHash, timestamp, { value: formattedFee });
+        const transaction = await contract.registerDocument(docHash, timestamp, {
+            value: formattedFee,
+            gasLimit: '150000'
+        });
         console.log('Transaction sent:', transaction);
 
-        // Wait for the transaction to be mined
-        const receipt = await transaction.wait();
-
-        // Determine the status based on the transaction receipt
-        let status = 'Failed'; // Default status
-        if (receipt.status) {
-            status = 'Success';
-        }
-
+        // Wait for the transaction to be confirmed
+        const status = await checkTransactionStatus(transaction.hash);
+        
         // Return an object that includes the status
-        return { status, transactionHash: transaction.hash, receipt };
+        return { status, transactionHash: transaction.hash };
     } catch (error) {
         console.error('Error registering document:', error);
         return { status: 'Error', message: error.message };
@@ -32,20 +29,15 @@ export async function registerDocument(docHash) {
 export async function verifyDocument(docHash, userAddress) {
     const contract = getContract();
     try {
+        // Call the verifyDocument method of the contract and wait for the result
         const [verified, timestamp, ret_hash] = await contract.verifyDocument(docHash, userAddress);
-        console.log('Verification result:', verified, 'Timestamp:', timestamp);
+        console.log('Verification result:', verified, 'Timestamp:', timestamp, 'Returned hash:', ret_hash);
 
-        // Determine the status based on the 'verified' value from smart contract
-        let status = 'Failed'; // Default status
-        if (verified) {
-            status = 'Verified';
-        }
-
-        // Return an object that includes the status
-        return { status, verified, timestamp, ret_hash };
+        // Return the result of verification
+        return { verified, timestamp, ret_hash };
     } catch (error) {
         console.error('Error verifying document:', error);
-        return { status: 'Error', message: error.message };
+        return { verified: false, message: error.message };
     }
 }
 
@@ -67,4 +59,15 @@ export function getContract() {
     const provider = new Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     return new Contract(contractAddress, abi, signer);
+}
+
+async function checkTransactionStatus(txHash) {
+    const provider = new Web3Provider(window.ethereum);
+    while (true) {
+        let txReceipt = await provider.getTransactionReceipt(txHash);
+        if (txReceipt && txReceipt.blockNumber) {
+            return txReceipt.status === 1 ? 'Success' : 'Failed';
+        }
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait for 5 seconds before retrying
+    }
 }
