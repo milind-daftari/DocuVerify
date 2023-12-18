@@ -48,10 +48,11 @@ function Upload({ user }) {
 
         setUploading(true);
         try {
-            const docHash = hash(selectedFile); // Hash the document
+            const fileContents = await readFile(selectedFile);
+            const docHash = hash(fileContents); // Hash the document
             const registrationResult = await register(docHash);
 
-            if (registrationResult.status === 'Success') {
+            if (registrationResult.status === 'Success') { 
                 const fileName = `${uuidv4()}_${selectedFile.name}`;
                 await Storage.put(fileName, selectedFile, {
                     contentType: selectedFile.type,
@@ -76,8 +77,7 @@ function Upload({ user }) {
                     username: user.username,
                     userAddress: user.metaMaskAddress,
                     fileSize: selectedFile.size.toString(),
-                    source: 'Upload',
-                    registrationStatus: 'Registered'
+                    source: 'Upload'
                 };
                 await API.post('documentAPI', '/upload-metadata', {
                     headers: { 'Content-Type': 'application/json' },
@@ -86,7 +86,7 @@ function Upload({ user }) {
 
                 setSuccess('Document Registered');
             } else {
-                setError('Registration in Smart Contract Failed');
+                setError("Document already registered");
             }
         } catch (err) {
             console.error('Error during file upload: ', err);
@@ -96,6 +96,20 @@ function Upload({ user }) {
             setSelectedFile(null);
             setDocumentDescription('');
         }
+    };
+
+    const readFile = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const arrayBuffer = reader.result;
+                const bytes = new Uint8Array(arrayBuffer);
+                const hexString = bytes.reduce((result, byte) => result + byte.toString(16).padStart(2, '0'), '');
+                resolve(hexString);
+            };
+            reader.onerror = (err) => reject(err);
+            reader.readAsArrayBuffer(file);
+        });
     };
 
     const handleSubmit = (e) => {
