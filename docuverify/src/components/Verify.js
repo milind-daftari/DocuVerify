@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Form, Alert, OverlayTrigger, Tooltip, Card, Row, Col } from 'react-bootstrap';
-import { Storage, API } from 'aws-amplify';
+import { API } from 'aws-amplify';
+import { id as hash } from '@ethersproject/hash';
 import { v4 as uuidv4 } from 'uuid';
+import { verifyDocument as verify } from '../utility/interact';
 
 function Verify({ user }) {
     const [error, setError] = useState('');
@@ -20,6 +22,7 @@ function Verify({ user }) {
             const fileName = file.name;
             if (!/^[a-zA-Z0-9.-_]+$/.test(fileName)) {
                 setError('File name should only have alphanumeric characters, hyphens, underscores, and dots.');
+                setSuccess('');
                 e.target.value = '';
                 return;
             }
@@ -27,12 +30,14 @@ function Verify({ user }) {
             const fileExtension = fileName.split('.').pop().toLowerCase();
             if (fileExtension !== 'pdf') {
                 setError('Invalid file type. Please upload a PDF.');
+                setSuccess('');
                 e.target.value = '';
                 return;
             }
 
             if (file.size > 5242880) {
                 setError('File size should not exceed 5MB.');
+                setSuccess('');
                 e.target.value = '';
                 return;
             }
@@ -49,59 +54,60 @@ function Verify({ user }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!selectedFile) {
+        if (!selectedFile || !isMetaMaskAddressValid(metaMaskAddressToValidate)) {
+            setError('Please provide a valid file and MetaMask address.');
             setSuccess('');
-            setError('Please upload a file for verification.');
-            return;
-        }
-        if (!isMetaMaskAddressValid(metaMaskAddressToValidate)) {
-            setSuccess('');
-            setError('Invalid MetaMask address. Please check and try again.');
             return;
         }
 
-        const uniqueFileName = `tmp/${uuidv4()}_${selectedFile.name}`;
         try {
-            await Storage.put(uniqueFileName, selectedFile, {
-                contentType: selectedFile.type,
-                metadata: {
-                    originalFileName: selectedFile.name,
-                    uploadTimestamp: new Date().toISOString(),
-                    username: user.username,
-                    userAddress: user.metaMaskAddress,
-                    toValidateFor: metaMaskAddressToValidate
-                },
-                // Server-side encryption with AWS KMS
-                serverSideEncryption: "aws:kms",
-                SSEKMSKeyId: "f9c61645-afb9-4ce7-97c7-d5dc95ba18ce"
-            });
+            const fileContents = await readFile(selectedFile);
+            const docHash = hash(fileContents); // Hash the document
+            const verificationResult = await verify(docHash, metaMaskAddressToValidate);
+
+            // Determine verification status
+            const verificationStatus = verificationResult.verified ? 'Verified' : 'Verification Failed';
 
             const metadata = {
-                documentId: uniqueFileName,
+                documentId: `${uuidv4()}_${docHash}`,
                 originalFileName: selectedFile.name,
                 uploadTimestamp: new Date().toISOString(),
                 username: user.username,
                 userAddress: user.metaMaskAddress,
                 toValidateFor: metaMaskAddressToValidate,
                 source: 'Verify',
-                isVerified: false
+                isVerified: verificationStatus
             };
             await API.post('documentAPI', '/upload-metadata', {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: metadata
             });
 
-            setSuccess('File uploaded for verification.');
+            if (verificationResult.verified) {
+                setSuccess('Document Verified');
+            } else {
+                setError('Verification Failed');
+            }
             setSelectedFile(null);
             setMetaMaskAddressToValidate('');
-            setError('');
         } catch (err) {
-            console.error('Error uploading the file for verification: ', err);
-            setError('Error uploading the file for verification.');
+            setError('Error during file verification: ' + (err.message || ''));
             setSuccess('');
         }
+    };
+
+    const readFile = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const arrayBuffer = reader.result;
+                const bytes = new Uint8Array(arrayBuffer);
+                const hexString = bytes.reduce((result, byte) => result + byte.toString(16).padStart(2, '0'), '');
+                resolve(hexString);
+            };
+            reader.onerror = (err) => reject(err);
+            reader.readAsArrayBuffer(file);
+        });
     };
 
     return (
