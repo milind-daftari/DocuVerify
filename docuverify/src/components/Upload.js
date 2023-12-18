@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Button, Form, Alert, OverlayTrigger, Tooltip, Row, Col } from 'react-bootstrap';
 import { Storage, API } from 'aws-amplify';
 import { v4 as uuidv4 } from 'uuid';
+import { id as hash } from '@ethersproject/hash';
+import { registerDocument as register } from '../utility/interact';
 
 function Upload({ user }) {
     const [error, setError] = useState('');
@@ -44,53 +46,55 @@ function Upload({ user }) {
             return;
         }
 
-        const uniqueFileName = `${uuidv4()}_${selectedFile.name}`;
         setUploading(true);
         try {
-            await Storage.put(uniqueFileName, selectedFile, {
-                contentType: selectedFile.type,
-                metadata: {
+            const docHash = hash(selectedFile); // Hash the document
+            const registrationResult = await register(docHash);
+
+            if (registrationResult.status === 'Success') {
+                const fileName = `${uuidv4()}_${selectedFile.name}`;
+                await Storage.put(fileName, selectedFile, {
+                    contentType: selectedFile.type,
+                    metadata: {
+                        description: documentDescription,
+                        originalFileName: selectedFile.name,
+                        uploadTimestamp: new Date().toISOString(),
+                        username: user.username,
+                        userAddress: user.metaMaskAddress,
+                        fileSize: selectedFile.size.toString(),
+                    },
+                    // Server-side encryption with AWS KMS
+                    serverSideEncryption: "aws:kms",
+                    SSEKMSKeyId: "f9c61645-afb9-4ce7-97c7-d5dc95ba18ce"
+                });
+
+                const metadata = {
+                    documentId: fileName,
                     description: documentDescription,
                     originalFileName: selectedFile.name,
                     uploadTimestamp: new Date().toISOString(),
                     username: user.username,
                     userAddress: user.metaMaskAddress,
                     fileSize: selectedFile.size.toString(),
-                },
-                // Server-side encryption with AWS KMS
-                serverSideEncryption: "aws:kms",
-                SSEKMSKeyId: "f9c61645-afb9-4ce7-97c7-d5dc95ba18ce"
-            });
+                    source: 'Upload',
+                    registrationStatus: 'Registered'
+                };
+                await API.post('documentAPI', '/upload-metadata', {
+                    headers: { 'Content-Type': 'application/json' },
+                    body: metadata
+                });
 
-            const metadata = {
-                documentId: uniqueFileName,
-                description: documentDescription,
-                originalFileName: selectedFile.name,
-                uploadTimestamp: new Date().toISOString(),
-                username: user.username,
-                userAddress: user.metaMaskAddress,
-                fileSize: selectedFile.size.toString(),
-                source: 'Upload',
-                isVerified: '',
-                toValidateFor: ''
-            };
-            await API.post('documentAPI', '/upload-metadata', {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: metadata
-            });
-
-            setSuccess('Upload successful!');
-            setSelectedFile(null);
-            setDocumentDescription('');
-            setError('');
+                setSuccess('Document Registered');
+            } else {
+                setError('Registration in Smart Contract Failed');
+            }
         } catch (err) {
-            console.error('Error uploading the file: ', err);
-            setError('Upload failed. Please try again.');
-            setSuccess('');
+            console.error('Error during file upload: ', err);
+            setError('Upload Failed. ' + (err.message || ''));
         } finally {
             setUploading(false);
+            setSelectedFile(null);
+            setDocumentDescription('');
         }
     };
 
@@ -108,7 +112,7 @@ function Upload({ user }) {
                     {error && <Alert variant="danger">{error}</Alert>}
                     <Form onSubmit={handleSubmit}>
                         <Form.Group controlId="formFile" className="mb-3">
-                            <Form.Label>Upload your document</Form.Label>
+                            <Form.Label>Document</Form.Label>
                             <OverlayTrigger
                                 placement="right"
                                 overlay={
@@ -123,17 +127,15 @@ function Upload({ user }) {
                             <Form.Label>Document Description (max 128 characters)</Form.Label>
                             <Form.Control 
                                 type="text" 
-                                placeholder="Enter a brief description of the document" 
+                                placeholder="Enter document description" 
                                 value={documentDescription}
                                 onChange={handleDescriptionChange}
-                                maxLength={128}
+                                maxLength={128} 
                             />
                         </Form.Group>
-                        <div className="d-flex justify-content-center">
-                            <Button variant="primary" type="submit" disabled={uploading}>
-                                {uploading ? 'Uploading...' : 'Upload'}
-                            </Button>
-                        </div>
+                        <Button variant="primary" type="submit" disabled={uploading}>
+                            {uploading ? 'Uploading...' : 'Upload'}
+                        </Button>
                     </Form>
                 </Col>
             </Row>

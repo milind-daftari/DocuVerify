@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Form, Alert, OverlayTrigger, Tooltip, Card, Row, Col } from 'react-bootstrap';
-import { Storage, API } from 'aws-amplify';
+import { API } from 'aws-amplify';
+import { id as hash } from '@ethersproject/hash';
 import { v4 as uuidv4 } from 'uuid';
+import { verifyDocument as verify } from '../utility/interact';
 
 function Verify({ user }) {
     const [error, setError] = useState('');
@@ -49,58 +51,38 @@ function Verify({ user }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!selectedFile) {
-            setSuccess('');
-            setError('Please upload a file for verification.');
-            return;
-        }
-        if (!isMetaMaskAddressValid(metaMaskAddressToValidate)) {
-            setSuccess('');
-            setError('Invalid MetaMask address. Please check and try again.');
+        if (!selectedFile || !isMetaMaskAddressValid(metaMaskAddressToValidate)) {
+            setError('Please provide a valid file and MetaMask address.');
             return;
         }
 
-        const uniqueFileName = `tmp/${uuidv4()}_${selectedFile.name}`;
         try {
-            await Storage.put(uniqueFileName, selectedFile, {
-                contentType: selectedFile.type,
-                metadata: {
-                    originalFileName: selectedFile.name,
-                    uploadTimestamp: new Date().toISOString(),
-                    username: user.username,
-                    userAddress: user.metaMaskAddress,
-                    toValidateFor: metaMaskAddressToValidate
-                },
-                // Server-side encryption with AWS KMS
-                serverSideEncryption: "aws:kms",
-                SSEKMSKeyId: "f9c61645-afb9-4ce7-97c7-d5dc95ba18ce"
-            });
+            const docHash = hash(selectedFile);
+            const fileName = `${uuidv4()}_${docHash}`;
+            const verificationResult = await verify(docHash, metaMaskAddressToValidate);
 
             const metadata = {
-                documentId: uniqueFileName,
+                documentId: fileName,
                 originalFileName: selectedFile.name,
                 uploadTimestamp: new Date().toISOString(),
                 username: user.username,
                 userAddress: user.metaMaskAddress,
                 toValidateFor: metaMaskAddressToValidate,
                 source: 'Verify',
-                isVerified: false
+                verificationStatus: verificationResult.status
             };
             await API.post('documentAPI', '/upload-metadata', {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: metadata
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(metadata)
             });
 
             setSuccess('File uploaded for verification.');
             setSelectedFile(null);
             setMetaMaskAddressToValidate('');
-            setError('');
         } catch (err) {
-            console.error('Error uploading the file for verification: ', err);
-            setError('Error uploading the file for verification.');
-            setSuccess('');
+            setError('Error during file verification: ' + (err.message || ''));
+        } finally {
+            setError('');
         }
     };
 
