@@ -18,6 +18,14 @@ function Upload({ user }) {
             const fileName = file.name;
             if (!/^[a-zA-Z0-9.-_]+$/.test(fileName)) {
                 setError('File name should only have alphanumeric characters, hyphens, underscores, and dots.');
+                setSuccess('');
+                e.target.value = '';
+                return;
+            }
+
+            if (file.size > 5242880) {
+                setError('File size should not exceed 5MB.');
+                setSuccess('');
                 e.target.value = '';
                 return;
             }
@@ -25,6 +33,7 @@ function Upload({ user }) {
             const fileExtension = fileName.split('.').pop().toLowerCase();
             if (fileExtension !== 'pdf') {
                 setError('Invalid file type. Please upload a PDF.');
+                setSuccess('');
                 e.target.value = '';
                 return;
             }
@@ -77,7 +86,9 @@ function Upload({ user }) {
                     username: user.username,
                     userAddress: user.metaMaskAddress,
                     fileSize: selectedFile.size.toString(),
-                    source: 'Upload'
+                    source: 'Upload',
+                    isVerified: '',
+                    toValidateFor: ''
                 };
                 await API.post('documentAPI', '/upload-metadata', {
                     headers: { 'Content-Type': 'application/json' },
@@ -85,12 +96,15 @@ function Upload({ user }) {
                 });
 
                 setSuccess('Document Registered');
+                setError('');
             } else {
                 setError("Document already registered");
+                setSuccess('');
             }
         } catch (err) {
             console.error('Error during file upload: ', err);
             setError('Upload Failed. ' + (err.message || ''));
+            setSuccess('');
         } finally {
             setUploading(false);
             setSelectedFile(null);

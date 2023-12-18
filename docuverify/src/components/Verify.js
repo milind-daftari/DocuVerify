@@ -22,6 +22,7 @@ function Verify({ user }) {
             const fileName = file.name;
             if (!/^[a-zA-Z0-9.-_]+$/.test(fileName)) {
                 setError('File name should only have alphanumeric characters, hyphens, underscores, and dots.');
+                setSuccess('');
                 e.target.value = '';
                 return;
             }
@@ -29,12 +30,14 @@ function Verify({ user }) {
             const fileExtension = fileName.split('.').pop().toLowerCase();
             if (fileExtension !== 'pdf') {
                 setError('Invalid file type. Please upload a PDF.');
+                setSuccess('');
                 e.target.value = '';
                 return;
             }
 
             if (file.size > 5242880) {
                 setError('File size should not exceed 5MB.');
+                setSuccess('');
                 e.target.value = '';
                 return;
             }
@@ -53,11 +56,13 @@ function Verify({ user }) {
         e.preventDefault();
         if (!selectedFile || !isMetaMaskAddressValid(metaMaskAddressToValidate)) {
             setError('Please provide a valid file and MetaMask address.');
+            setSuccess('');
             return;
         }
 
         try {
-            const docHash = hash(selectedFile); // Hash the document
+            const fileContents = await readFile(selectedFile);
+            const docHash = hash(fileContents); // Hash the document
             const verificationResult = await verify(docHash, metaMaskAddressToValidate);
 
             // Determine verification status
@@ -78,14 +83,31 @@ function Verify({ user }) {
                 body: metadata
             });
 
-            setSuccess(`Verification Status: ${verificationStatus}`);
+            if (verificationResult.verified) {
+                setSuccess('Document Verified');
+            } else {
+                setError('Verification Failed');
+            }
             setSelectedFile(null);
             setMetaMaskAddressToValidate('');
         } catch (err) {
             setError('Error during file verification: ' + (err.message || ''));
-        } finally {
-            setError('');
+            setSuccess('');
         }
+    };
+
+    const readFile = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const arrayBuffer = reader.result;
+                const bytes = new Uint8Array(arrayBuffer);
+                const hexString = bytes.reduce((result, byte) => result + byte.toString(16).padStart(2, '0'), '');
+                resolve(hexString);
+            };
+            reader.onerror = (err) => reject(err);
+            reader.readAsArrayBuffer(file);
+        });
     };
 
     return (
