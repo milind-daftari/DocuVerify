@@ -13,8 +13,6 @@ function History({ user }) {
     useEffect(() => {
         const fetchDocuments = async () => {
             setLoading(true);
-            setError('');
-
             try {
                 const response = await API.get('documentAPI', `/document/${user.username}`);
                 if (Array.isArray(response)) {
@@ -30,16 +28,14 @@ function History({ user }) {
         };
 
         fetchDocuments();
-    }, [user.username, user]);
+        // const intervalId = setInterval(fetchDocuments, 30000); // Polling every 30 seconds
+        // return () => clearInterval(intervalId);
+    }, [user.username]);
 
-    const handleDownload = async (documentId, source) => {
+    const handleDownload = async (documentId) => {
         try {
-            // Using AWS Amplify to make the GET request
-            const presignedUrlResponse = await API.get('documentAPI', `/download?documentId=${documentId}&source=${source}`);
-    
-            // Assuming the response contains a URL in the format { url: "your_presigned_url_here" }
+            const presignedUrlResponse = await API.get('documentAPI', `/download?documentId=${documentId}`);
             const presignedUrl = presignedUrlResponse.url;
-    
             const response = await axios.get(presignedUrl, { responseType: 'blob' });
             FileSaver.saveAs(response.data, documentId);
         } catch (error) {
@@ -47,7 +43,6 @@ function History({ user }) {
             setError('Error downloading the document. Please try again.');
         }
     };
-    
 
     return (
         <div className="container mt-5">
@@ -77,31 +72,31 @@ function History({ user }) {
                                 <tr>
                                     <th>File Name</th>
                                     <th>Upload Timestamp</th>
-                                    {selectedOption === 'uploaded' && <th>Description</th>}
-                                    {selectedOption === 'verified' && <>
-                                        <th>MetaMask Address to Validate</th>
-                                        <th>Is Verified</th>
-                                    </>}
-                                    <th>Actions</th>
+                                    <th>Status</th>
+                                    {selectedOption === 'uploaded' && <th>Actions</th>}
                                 </tr>
                             </thead>
                             <tbody>
-                                {documents.filter(doc => 
-                                    selectedOption === 'uploaded' ? doc.source === 'Upload' : doc.source === 'Verify'
-                                ).map((doc, index) => (
+                                {documents.filter(doc => selectedOption === 'uploaded' ? doc.source === 'Upload' : doc.source === 'Verify').map((doc, index) => (
                                     <tr key={index}>
                                         <td>{doc.originalFileName}</td>
                                         <td>{new Date(doc.uploadTimestamp).toLocaleString()}</td>
-                                        {selectedOption === 'uploaded' && <td>{doc.description}</td>}
-                                        {selectedOption === 'verified' && <>
-                                            <td>{doc.toValidateFor}</td>
-                                            <td>{doc.isVerified ? 'Yes' : 'No'}</td>
-                                        </>}
                                         <td>
-                                            <Button variant="primary" onClick={() => handleDownload(doc.documentId, doc.source)}>
-                                                Download
-                                            </Button>
+                                            {doc.source === 'Verify' ? (
+                                                doc.verificationStatus === 'Verified' ? 'Document Verified' :
+                                                doc.verificationStatus === 'In Progress' ? 'Verification In Progress' :
+                                                'Verification Pending'
+                                            ) : (
+                                                'Uploaded'
+                                            )}
                                         </td>
+                                        {selectedOption === 'uploaded' && (
+                                            <td>
+                                                <Button variant="primary" onClick={() => handleDownload(doc.documentId)}>
+                                                    Download
+                                                </Button>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))}
                             </tbody>
