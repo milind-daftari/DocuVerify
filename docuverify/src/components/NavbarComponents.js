@@ -4,7 +4,7 @@ import { Flex, Button, Image } from '@aws-amplify/ui-react';
 
 function NavbarComponent({ isConnected, onConnect, onDisconnect, isCognitoAuthenticated, onSignOut }) {
     return (
-        <Flex as="nav" justifyContent="space-between" padding="15px" backgroundColor="#ADD8E6" position="fixed" width="100%">
+        <Flex as="nav" justifyContent="space-between" padding="15px" backgroundColor="#ADD8E6" position="sticky" width="100%">
             <Flex gap="10px" alignItems="center">
                 <Link to="/">
                     <Image src={`${process.env.PUBLIC_URL}/logo.png`} alt="DocuVerify Logo" width="50px" />
